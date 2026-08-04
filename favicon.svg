@@ -1,0 +1,16 @@
+<svg viewBox="8 0 112 112" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+  <style>
+    path {
+      fill: #12151b;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: #f4f5f7;
+      }
+    }
+  </style>
+  <path d="m96.506 11.449-3.695-4.248 3.415-4.248h2.568l-3.488 4.248 3.876 4.248h-2.676Z" fill-rule="nonzero" transform="translate(-504.157 8.324) scale(6.23279)"/>
+  <path d="M95.637 6.889V2.953h3.157l-3.157 3.936Z" fill-rule="nonzero" transform="translate(-523.955 8.327) scale(6.23279)"/>
+  <path d="M41.882 79.784c14.818-.577 26.386-12.956 25.814-27.625-.404-10.382-6.78-19.146-15.724-23.18L19.55 69.439a26.928 26.928 0 0 0 22.33 10.346ZM16.664 64.827c.069.141 1.142 2.102 1.142 2.102l31.348-39.014s-4.398-1.482-9.342-1.29c-14.82.574-26.387 12.955-25.815 27.625a26.26 26.26 0 0 0 2.667 10.577Z"/>
+</svg>

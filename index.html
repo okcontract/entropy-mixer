@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Mix a 16-sample pointer transcript with fresh operating-system CSPRNG bytes."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'none'; connect-src ws: wss:; worker-src 'none'; manifest-src 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#f3f3ed" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Entropy Mixer</title>
+  </head>
+  <body>
+    <main class="app">
+      <header class="site-header">
+        <div class="site-title">
+          <a href="https://okcontract.com" aria-label="OKcontract">
+            <img class="site-logo" src="./favicon.svg" alt="" />
+          </a>
+          <h1>Entropy mixer</h1>
+        </div>
+        <p>
+          Load this page from a guest session and disconnect Internet before using.
+        </p>
+      </header>
+
+      <section class="panel" aria-labelledby="stage-title">
+        <header class="panel-header">
+          <h2 id="stage-title">1. Collect samples</h2>
+          <button id="reset-game" class="button secondary" type="button" disabled>
+            Reset
+          </button>
+        </header>
+
+        <div id="game-stage">
+          <div class="progress-row">
+            <div
+              id="click-progress"
+              class="progress"
+              role="progressbar"
+              aria-label="Sample collection progress"
+              aria-valuemin="0"
+              aria-valuemax="16"
+              aria-valuenow="0"
+            >
+              <span id="progress-fill"></span>
+            </div>
+            <span id="progress-label">0 / 16</span>
+          </div>
+
+          <div id="arena" class="arena">
+            <button id="target" class="target" type="button" hidden>
+              <span aria-hidden="true"></span>
+            </button>
+            <div id="arena-overlay" class="arena-overlay">
+              <p id="overlay-copy">Hit each target at variable precision and pace.</p>
+              <button id="start-game" class="button primary" type="button">
+                Start
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="generation-stage" hidden>
+          <div class="control-grid">
+            <label class="field" for="key-type">
+              <span>Key type</span>
+              <select id="key-type" disabled>
+                <option value="raw-128">Raw 128-bit</option>
+                <option value="raw-256" selected>Raw 256-bit</option>
+                <option value="bip39-12">BIP-39 12-word phrase</option>
+                <option value="bip39-24">BIP-39 24-word phrase</option>
+                <option value="bitcoin">Bitcoin mainnet P2WPKH</option>
+                <option value="ethereum">Ethereum EOA</option>
+              </select>
+            </label>
+
+            <label class="field" for="key-count">
+              <span>Count</span>
+              <select id="key-count" disabled>
+                <option value="1" selected>1</option>
+                <option value="4">4</option>
+                <option value="8">8</option>
+              </select>
+            </label>
+
+            <fieldset class="field encoding" disabled>
+              <legend>Encoding</legend>
+              <div>
+                <label>
+                  <input type="radio" name="encoding" value="hex" checked />
+                  <span>Hex</span>
+                </label>
+                <label>
+                  <input type="radio" name="encoding" value="base64" />
+                  <span>Base64</span>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="output-areas">
+            <section
+              id="private-output-area"
+              class="output-area"
+              aria-labelledby="private-output-label"
+            >
+              <div class="output-area-header">
+                <label id="private-output-label" for="private-key-output">
+                  Generated keys
+                </label>
+                <div class="copy-control">
+                  <span id="private-copy-feedback" aria-live="polite"></span>
+                  <button
+                    id="copy-private-keys"
+                    class="button secondary"
+                    type="button"
+                    disabled
+                  >
+                    Copy private
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="private-key-output"
+                rows="5"
+                readonly
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                wrap="off"
+                placeholder="Generate to show output"
+              ></textarea>
+            </section>
+
+            <p id="mnemonic-preview-settings" class="mnemonic-preview-settings" hidden>
+              BIP-39 passphrase: none
+            </p>
+
+            <section
+              id="bitcoin-output-area"
+              class="output-area"
+              aria-labelledby="bitcoin-output-label"
+              hidden
+            >
+              <div class="output-area-header">
+                <label id="bitcoin-output-label" for="bitcoin-address-output">
+                  Bitcoin addresses
+                </label>
+                <div class="copy-control">
+                  <span id="bitcoin-copy-feedback" aria-live="polite"></span>
+                  <button
+                    id="copy-bitcoin-addresses"
+                    class="button secondary"
+                    type="button"
+                    disabled
+                  >
+                    Copy addresses
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="bitcoin-address-output"
+                rows="5"
+                readonly
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                wrap="off"
+                placeholder="Generate to show Bitcoin addresses"
+              ></textarea>
+            </section>
+
+            <section
+              id="ethereum-output-area"
+              class="output-area"
+              aria-labelledby="ethereum-output-label"
+              hidden
+            >
+              <div class="output-area-header">
+                <label id="ethereum-output-label" for="ethereum-address-output">
+                  Ethereum addresses
+                </label>
+                <div class="copy-control">
+                  <span id="ethereum-copy-feedback" aria-live="polite"></span>
+                  <button
+                    id="copy-ethereum-addresses"
+                    class="button secondary"
+                    type="button"
+                    disabled
+                  >
+                    Copy addresses
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="ethereum-address-output"
+                rows="5"
+                readonly
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                wrap="off"
+                placeholder="Generate to show Ethereum addresses"
+              ></textarea>
+            </section>
+          </div>
+
+          <div class="output-meta">
+            <span id="output-meta"></span>
+          </div>
+
+          <div class="actions">
+            <button id="generate-keys" class="button primary" type="button" disabled>
+              Generate
+            </button>
+          </div>
+
+          <output id="crypto-status" class="crypto-status" aria-live="polite">
+            OS draw pending
+          </output>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>
+          Experimental and unaudited — use at your own risk; not for meaningful
+          funds.
+        </p>
+      </footer>
+    </main>
+
+    <!--
+      @noble/curves and @noble/hashes
+      Copyright (c) 2022 Paul Miller (https://paulmillr.com)
+
+      @scure/base
+      Copyright (c) 2022 Paul Miller (https://paulmillr.com)
+
+      @scure/bip32 and @scure/bip39
+      Copyright (c) 2022 Patricio Palladino, Paul Miller (paulmillr.com)
+
+      The MIT License (MIT)
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the "Software"), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in
+      all copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+      THE SOFTWARE.
+    -->
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
