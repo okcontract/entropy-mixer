@@ -47,7 +47,7 @@
     "@noble/curves": "2.2.0",
     "@noble/hashes": "2.2.0",
     "@scure/bip32": "2.2.0",
-    "@scure/bip39": "2.2.0"
+    "@scure/bip39": "2.3.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.3",
